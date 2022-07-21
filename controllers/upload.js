@@ -7,7 +7,6 @@ cloudinary.config(process.env.CLOUDINARY_URL);
 
 const User = require('../models/user');
 const Product = require('../models/product');
-const { model } = require("mongoose");
 
 
 const handleImageCloudinary = async(req, res = response) => {
@@ -20,9 +19,7 @@ const handleImageCloudinary = async(req, res = response) => {
 
         switch (collection) {
             case 'users':
-                model = await User.findById(id)
-                                            .populate('user', 'name')
-                                            .populate('category', 'name');
+                model = await User.findById(id);
                 if( !model ){
                     return res.status(400).json({ msg: `Usuario ID: ${id} no existe ` });
                 }
@@ -30,8 +27,6 @@ const handleImageCloudinary = async(req, res = response) => {
 
             case 'products':
                 model = await Product.findById(id)
-                                            .populate('user', 'name')
-                                            .populate('category', 'name');
                 if( !model ){
                     return res.status(400).json({ msg: `Producto ID: ${id} no existe` });
                 }
@@ -58,9 +53,20 @@ const handleImageCloudinary = async(req, res = response) => {
     
         await model.save();   // save img on database
 
+        if (collection === 'users'){
+            return res.status(200).json({
+                model
+            });
+        };
+
+        const prod = Product.findById(id)
+                                        .populate('user', 'name')
+                                        .populate('category', 'name');
+
         res.status(200).json({
-            model
+            model: prod
         });
+
     
         
     } catch (error) {

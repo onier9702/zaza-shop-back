@@ -5,7 +5,6 @@ const User = require('../models/user');
 const generateJWT = require("../helpers/generateJWT");
 
 // Revalidate Token
-userRevalidateToken
 const userRevalidateToken = async( req, res = response ) => {
 
     try {

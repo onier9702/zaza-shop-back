@@ -90,6 +90,7 @@ const createProduct = async(req , res = response) => {
         const product = new Product(data);
     
         await product.save();
+
         const prod = await Product.findById(product._id)
                                                 .populate('user', 'name')
                                                 .populate('category', 'name');

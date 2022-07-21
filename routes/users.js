@@ -2,13 +2,21 @@
 const {Router} = require('express');
 const { check } = require('express-validator');
 
-const {userCreateController, userLoginController, userGetController, userUpdateController, userDeleteController, userGetSellersController, userGetOneById} = require('../controllers/user');
+const {userCreateController, userLoginController, userGetController, userUpdateController, userDeleteController, userGetSellersController, userGetOneById, userRevalidateToken} = require('../controllers/user');
 const { emailExists, idExists } = require('../helpers/db-validators');
 const { isAdminRole } = require('../middlewares/validate-role');
 const { validateFields } = require('../middlewares/validateFields');
 const { validateJWT } = require('../middlewares/validateJWT');
 
 const router = Router();
+
+
+// Revalidate Token
+router.post('/renew', [
+    validateJWT
+    ],
+    userRevalidateToken
+);
 
 // Create user --public
 router.post('/new', [

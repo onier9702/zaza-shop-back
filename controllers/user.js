@@ -4,6 +4,40 @@ const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
 const generateJWT = require("../helpers/generateJWT");
 
+// Revalidate Token
+userRevalidateToken
+const userRevalidateToken = async( req, res = response ) => {
+
+    try {
+        
+        const user = await User.findById( req.user._id );
+
+        // verify if user is active( state: true )
+        if ( !user.state ){
+            return res.status(400).json({
+                ok: false,
+                msg: 'El usuario no existe o fue borrado anteriormente'
+            });
+        };
+
+        // Generate JWT
+        const token = await generateJWT(req.user._id, req.user.name );
+
+        res.status(200).json({
+            user,
+            token
+        });
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(501).json({
+            ok: false,
+            msg: 'Contacte al Administrador a este +53 54474824'
+        })
+    }
+};
+
 // Create user
 const userCreateController = async(req, res = response) => {
 
@@ -67,7 +101,7 @@ const userLoginController = async(req, res = response) => {
         };
 
         // Generate JWT to logged user
-        const token = await generateJWT(user.id);
+        const token = await generateJWT(user.id, user.name);
 
         res.status(200).json({
             user,
@@ -229,5 +263,6 @@ module.exports = {
     userUpdateController,
     userDeleteController,
     userGetSellersController,
-    userGetOneById
+    userGetOneById,
+    userRevalidateToken
 }

@@ -15,19 +15,19 @@ const handleImageCloudinary = async(req, res = response) => {
 
         const { collection, id } = req.params;
 
-        let model;
+        let modelo;
 
         switch (collection) {
             case 'users':
-                model = await User.findById(id);
-                if( !model ){
+                modelo = await User.findById(id);
+                if( !modelo ){
                     return res.status(400).json({ msg: `Usuario ID: ${id} no existe ` });
                 }
                 break;
 
             case 'products':
-                model = await Product.findById(id);
-                if( !model ){
+                modelo = await Product.findById(id);
+                if( !modelo ){
                     return res.status(400).json({ msg: `Producto ID: ${id} no existe` });
                 }
                 break;
@@ -37,9 +37,9 @@ const handleImageCloudinary = async(req, res = response) => {
         };
 
         // cleaning preview images
-        if (model.img){
+        if (modelo.img){
             // delete img from server to avoid duplicates
-            const nameArr = model.img.split('/');
+            const nameArr = modelo.img.split('/');
             const name    = nameArr[ nameArr.length - 1 ];
             const [ public_id ]    = name.split('.');
             cloudinary.uploader.destroy(public_id);
@@ -49,13 +49,29 @@ const handleImageCloudinary = async(req, res = response) => {
         const { tempFilePath } = req.files.file; // file uploaded for user
         const {secure_url} = await cloudinary.uploader.upload(tempFilePath);
         
-        model.img = secure_url;   // img added
+        modelo.img = secure_url;   // img added
     
-        await model.save();   // save img on database
+        await modelo.save();   // save img on database
+
+        if (collection === 'users'){
+            const user = await User.findById( id )
+                                        .populate('user', 'name')
+                                        .populate('category', 'name');
+
+            res.status(200).json({
+                model: user
+            });
+
+        } else {
+            const product = await Product.findById( id )
+                                        .populate('user', 'name')
+                                        .populate('category', 'name');
+
+            res.status(200).json({
+                model: product
+            });
+        };
     
-        res.status(200).json({
-            model
-        });
         
     } catch (error) {
         console.log(error);

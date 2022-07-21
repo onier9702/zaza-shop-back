@@ -89,7 +89,7 @@ const userGetController = async( req, res = response ) => {
 
     try {
         
-        const { limit = 5, since = 0 } = req.query;
+        const { limit, since} = req.query;
         const query = { state: true };
     
         const [ total, users ] = await Promise.all([
@@ -112,6 +112,64 @@ const userGetController = async( req, res = response ) => {
         });
     }
 };
+
+// Get all sellers
+const userGetSellersController = async( req, res = response ) => {
+
+    try { 
+
+        const query = {
+            $or: [{role: 'SALE_ROLE'}, {role: 'ADMIN_ROLE'}],
+            $and: [{ state: true }]
+        };
+    
+        const [ total, users ] = await Promise.all([
+            User.countDocuments(query),
+            User.find(query)
+        ]);
+    
+        res.status(200).json({
+            total,
+            sellers: users
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(501).json({
+            ok: false,
+            msg: 'Contacte al Administrator +53 54474824'
+        });
+    }
+};
+
+// Get One User By id
+const userGetOneById = async( req, res = response ) => {
+
+    try {
+        
+        const {id} = req.params;
+    
+        const user = await User.findById(id);
+        if (!user.state){
+            return res.status(400).json({
+                ok:false,
+                msg: 'El usuario fue borrado anteriormente y ya no existe'
+            });
+        };
+    
+        res.status(200).json({
+            user
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(501).json({
+            ok: false,
+            msg: 'Contacte al Administrator +53 54474824'
+        });
+    }
+};
+
 
 // Update an User
 const userUpdateController = async( req, res = response) => {
@@ -169,5 +227,7 @@ module.exports = {
     userLoginController,
     userGetController,
     userUpdateController,
-    userDeleteController
+    userDeleteController,
+    userGetSellersController,
+    userGetOneById
 }

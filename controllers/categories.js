@@ -6,7 +6,7 @@ const getAllCategories = async(req, res = response) => {
 
     try {
 
-        const { limit = 3, since = 0 } = req.query;
+        const { limit , since } = req.query;
     
         const query = {state: true};
         

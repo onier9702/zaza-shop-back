@@ -2,8 +2,8 @@
 const {Router} = require('express');
 const { check } = require('express-validator');
 
-const {userCreateController, userLoginController, userGetController, userUpdateController, userDeleteController} = require('../controllers/user');
-const { emailExists, isValidRole, idExists } = require('../helpers/db-validators');
+const {userCreateController, userLoginController, userGetController, userUpdateController, userDeleteController, userGetSellersController, userGetOneById} = require('../controllers/user');
+const { emailExists, idExists } = require('../helpers/db-validators');
 const { isAdminRole } = require('../middlewares/validate-role');
 const { validateFields } = require('../middlewares/validateFields');
 const { validateJWT } = require('../middlewares/validateJWT');
@@ -37,6 +37,18 @@ router.get('/', [
     isAdminRole
     ],
     userGetController
+);
+
+// Get All Users with sale-role --public
+router.get('/sellers', userGetSellersController );
+
+// Get an user by ID --public
+router.get('/:id', [
+    check('id', 'Este ID no es valido').isMongoId(),
+    check('id').custom( idExists ),
+    validateFields
+    ],
+    userGetOneById
 );
 
 // Update an user --private by ID

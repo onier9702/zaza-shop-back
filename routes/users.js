@@ -12,7 +12,7 @@ const router = Router();
 
 
 // Revalidate Token
-router.post('/renew', [
+router.get('/renew', [
     validateJWT
     ],
     userRevalidateToken

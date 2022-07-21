@@ -10,7 +10,7 @@ const userRevalidateToken = async( req, res = response ) => {
     try {
         
         const user = await User.findById( req.user._id );
-
+        
         // verify if user is active( state: true )
         if ( !user.state ){
             return res.status(400).json({
@@ -20,7 +20,7 @@ const userRevalidateToken = async( req, res = response ) => {
         };
 
         // Generate JWT
-        const token = await generateJWT(req.user._id, req.user.name );
+        const token = await generateJWT(user._id, user.name );
 
         res.status(200).json({
             user,

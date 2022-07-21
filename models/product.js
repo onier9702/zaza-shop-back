@@ -50,7 +50,8 @@ const ProductSchema = Schema({
 });
 
 ProductSchema.methods.toJSON = function() {
-    const { __v, state, ...data } = this.toObject();
+    const { __v, _id, state, ...data } = this.toObject();
+    data.id = _id;
     return data;
 };
 

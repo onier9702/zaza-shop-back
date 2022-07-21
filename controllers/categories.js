@@ -14,7 +14,6 @@ const getAllCategories = async(req, res = response) => {
             Category.countDocuments(query),
             Category.find(query)
                     .populate('user', 'name')
-                    // .populate('user', 'uid')
                     .skip(since)
                     .limit(limit)
         ]);
@@ -76,8 +75,8 @@ const getCategoryByID = async( req, res = response ) => {
 
         const {id} = req.params;
     
-        const categoryDB = await Category.findById(id);
-                                            
+        const categoryDB = await Category.findById(id)
+                                            .populate('user', 'name');
     
         if(!categoryDB.state){
             return res.status(401).json({
@@ -103,32 +102,14 @@ const updatingCategory = async(req, res = response) => {
 
     try {
 
-        const {id} = req.params;
-
-        const test = await Category.findById(id);
-        const obj = test.user;
-
-
-
-        let pa = toString(obj);
-        console.log(pa);
-        
-        console.log(obj);
-        
-        // if (obj.includes(req.user._id)){
-        //     console.log(yes);
-        // }
-        
-        
-        
-
-        // if ( req.user._id !==  )
+        const {id} = req.params;        
         const { state, user , ...data} = req.body;
     
         data.name = data.name.toUpperCase();
         data.user = req.user._id;
     
-        const categ = await Category.findByIdAndUpdate(id, data, {new: true});
+        const categ = await Category.findByIdAndUpdate(id, data, {new: true})
+                                        .populate('user', 'name');
     
         res.status(200).json({
             category: categ
@@ -149,7 +130,8 @@ const deleteOneCategory = async(req, res = response) => {
     const {id} = req.params;
 
     // Deleting not physically so changing state to false
-    const catDeleted = await Category.findByIdAndUpdate(id, {state: false}, {new: true});
+    const catDeleted = await Category.findByIdAndUpdate(id, {state: false}, {new: true})
+                                            .populate('user', 'name');
 
     res.json({
         deleted: catDeleted

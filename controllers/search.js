@@ -27,7 +27,7 @@ const searchUserOnDB = async( terminus = '', res = response) => {
     };
 
     // find regular expresions
-    const regex = new RegExp(terminus, 'i'); 
+    const regex = new RegExp(terminus, 'i');
 
     // here terminus is a name
     const users = await User.find({
@@ -56,7 +56,9 @@ const searchCategoryOnDB = async( terminus = '', res = response) => {
     const regex = new RegExp(terminus, 'i'); 
 
     // here terminus is a name
-    const categories = await Category.find({ name: regex, state: true });
+    const categories = await Category.find({ name: regex, state: true })
+                                        .populate('user', 'name');
+                                                
 
     res.json({
         results: categories
@@ -96,7 +98,7 @@ const searchController = (req, res = response) => {
 
     if ( !permittedCollections.includes(collection) ){
         return res.status(400).json({
-            msg: `Las collectiones permitidas son solo estas: [ ${permittedCollections} ]`
+            msg: `Las colecciones permitidas son solo estas: [ ${permittedCollections} ]`
         });
     };
 

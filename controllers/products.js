@@ -120,7 +120,9 @@ const updatingProductById = async(req, res = response) => {
         // rest.user = req.user._id;
     
     
-        const product = await Product.findByIdAndUpdate(id, rest, {new: true});
+        const product = await Product.findByIdAndUpdate(id, rest, {new: true})
+                                            .populate('user', 'name')
+                                            .populate('category', 'name');
     
         res.status(200).json({
             product
@@ -141,7 +143,9 @@ const deletingProductById = async(req, res = response) => {
         
         const {id} = req.params;
     
-        const product = await Product.findByIdAndUpdate(id, {state: false}, {new: true});
+        const product = await Product.findByIdAndUpdate(id, {state: false}, {new: true})
+                                                .populate('user', 'name')
+                                                .populate('category', 'name');
     
         res.status(200).json({
             product

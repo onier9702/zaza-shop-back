@@ -7,6 +7,7 @@ cloudinary.config(process.env.CLOUDINARY_URL);
 
 const User = require('../models/user');
 const Product = require('../models/product');
+const { model } = require("mongoose");
 
 
 const handleImageCloudinary = async(req, res = response) => {
@@ -15,19 +16,23 @@ const handleImageCloudinary = async(req, res = response) => {
 
         const { collection, id } = req.params;
 
-        let modelo;
+        let model;
 
         switch (collection) {
             case 'users':
-                modelo = await User.findById(id);
-                if( !modelo ){
+                model = await User.findById(id)
+                                            .populate('user', 'name')
+                                            .populate('category', 'name');
+                if( !model ){
                     return res.status(400).json({ msg: `Usuario ID: ${id} no existe ` });
                 }
                 break;
 
             case 'products':
-                modelo = await Product.findById(id);
-                if( !modelo ){
+                model = await Product.findById(id)
+                                            .populate('user', 'name')
+                                            .populate('category', 'name');
+                if( !model ){
                     return res.status(400).json({ msg: `Producto ID: ${id} no existe` });
                 }
                 break;
@@ -37,9 +42,9 @@ const handleImageCloudinary = async(req, res = response) => {
         };
 
         // cleaning preview images
-        if (modelo.img){
+        if (model.img){
             // delete img from server to avoid duplicates
-            const nameArr = modelo.img.split('/');
+            const nameArr = model.img.split('/');
             const name    = nameArr[ nameArr.length - 1 ];
             const [ public_id ]    = name.split('.');
             cloudinary.uploader.destroy(public_id);
@@ -49,28 +54,13 @@ const handleImageCloudinary = async(req, res = response) => {
         const { tempFilePath } = req.files.file; // file uploaded for user
         const {secure_url} = await cloudinary.uploader.upload(tempFilePath);
         
-        modelo.img = secure_url;   // img added
+        model.img = secure_url;   // img added
     
-        await modelo.save();   // save img on database
+        await model.save();   // save img on database
 
-        if (collection === 'users'){
-            const user = await User.findById( id )
-                                        .populate('user', 'name')
-                                        .populate('category', 'name');
-
-            res.status(200).json({
-                model: user
-            });
-
-        } else {
-            const product = await Product.findById( id )
-                                        .populate('user', 'name')
-                                        .populate('category', 'name');
-
-            res.status(200).json({
-                model: product
-            });
-        };
+        res.status(200).json({
+            model
+        });
     
         
     } catch (error) {

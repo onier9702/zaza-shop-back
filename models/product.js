@@ -31,7 +31,7 @@ const ProductSchema = Schema({
         required: true
     },
     precio: {
-        type: Number,
+        type: String,
         default: 0,
     },
     category: {
